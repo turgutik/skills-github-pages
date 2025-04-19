@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Викторина</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        #game-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #question-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .answer-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .answer-btn:hover {
+            background-color: #45a049;
+        }
+        #result-container {
+            display: none;
+        }
+        #share-buttons {
+            margin-top: 20px;
+        }
+        .share-btn {
+            padding: 8px 15px;
+            margin: 0 5px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #restart-btn {
+            padding: 10px 20px;
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .progress {
+            height: 10px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Тест на сколько хорошо ты знаешь итальянских животных</h1>
+        <div class="progress-bar">
+            <div class="progress" id="progress-bar"></div>
+        </div>
+        
+        <div id="quiz-container">
+            <img id="question-image" src="" alt="Вопрос">
+            <h2 id="question-text"></h2>
+            <div id="answers-container"></div>
+        </div>
+        
+        <div id="result-container">
+            <h2>Ваш результат: <span id="score"></span>/10</h2>
+            <p id="result-text"></p>
+            <div id="share-buttons">
+                <button class="share-btn" onclick="shareVK()">Поделиться ВКонтакте</button>
+                <button class="share-btn" onclick="shareTelegram()">Поделиться в Telegram</button>
+            </div>
+            <button id="restart-btn" onclick="restartQuiz()">Пройти заново</button>
+        </div>
+    </div>
+
+    <script>
+        // Данные викторины
+        const quizData = [
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/scale_1200.jpg",
+                answers: ["Тралалеро-тралала", "Бомбордиро крокодило", "Тун тун тун тун тун саур", "Емеля-пельмен"],
+                correct: 0
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/maxresdefault.jpg",
+                answers: ["Бомбордиро-крокодило", "Бикус-зе дикус-зе бикус-зе дикус", "Глорбо", "Тун тун тун тун тун саур"],
+                correct: 3
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/maxresdefault (1).jpg",
+                answers: ["Удиндиндиндиндун Мадиндиндиндун", "Балерино капуччино", "Леопардино Ангурино", "Бумбуль Бафибафибум"],
+                correct: 1
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/scale_2400.png",
+                answers: ["Голубиро шпиониро", "Ла вака Сатурно сатурнита", "Борбано Капиформаджо", "Глорбо"],
+                correct: 1
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/scale_1200.png",
+                answers: ["Балерино капучино", "Пигопигопигопиго", "Бонека амбалабу", "Тралалера тралала"],
+                correct: 2
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/scale_1200 (1).png",
+                answers: ["Капу капу капучино ассасино", "Глорбо", "Голубиро шпиониро", "Леопардино ангурино"],
+                correct: 0
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/scale_1200 (2).png",
+                answers: ["Голубиро шпиониро", "Ла вака Сатурно сатурнита", "Борбано Капиформаджо", "Глорбо"],
+                correct: 0
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/image.png",
+                answers: ["Тралалеро-тралала", "Бомбордиро крокодило", "Тун тун тун тун тун саур", "Трипи тропа тропа трипа"],
+                correct: 3
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/Скриншот 19-04-2025 213450.jpg",
+                answers: ["Шимпанзини бананини", "Бр бр патамим", "Бонека амбалабу", "Фриго камело буфо фартело"],
+                correct: 0
+            },
+            {
+                question: "Какое животное изображено на картинке?",
+                image: "img/maxresdefault (2).jpg",
+                answers: ["Бобрито бандито", "Бр бр патамим", "Бонека амбалабу", "Фриго камело буфо фартело"],
+                correct: 0
+            }
+        ];
+
+        // Переменные игры
+        let currentQuestion = 0;
+        let score = 0;
+        const questionText = document.getElementById('question-text');
+        const questionImage = document.getElementById('question-image');
+        const answersContainer = document.getElementById('answers-container');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const scoreElement = document.getElementById('score');
+        const resultText = document.getElementById('result-text');
+        const progressBar = document.getElementById('progress-bar');
+
+        // Начало игры
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        // Показать вопрос
+        function showQuestion() {
+            progressBar.style.width = `${(currentQuestion / quizData.length) * 100}%`;
+            
+            const question = quizData[currentQuestion];
+            questionText.textContent = question.question;
+            questionImage.src = question.image;
+            questionImage.alt = question.question;
+            
+            answersContainer.innerHTML = '';
+            question.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.textContent = answer;
+                button.classList.add('answer-btn');
+                button.addEventListener('click', () => selectAnswer(index));
+                answersContainer.appendChild(button);
+            });
+        }
+
+        // Выбор ответа
+        function selectAnswer(index) {
+            const correct = quizData[currentQuestion].correct;
+            
+            if (index === correct) {
+                score++;
+            }
+            
+            currentQuestion++;
+            
+            if (currentQuestion < quizData.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Показать результат
+        function showResult() {
+            quizContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            scoreElement.textContent = score;
+            
+            if (score === quizData.length) {
+                resultText.textContent = "Потрясающе! Вы ответили правильно на все вопросы!";
+            } else if (score >= quizData.length * 0.7) {
+                resultText.textContent = "Хороший результат! Вы знаете многое!";
+            } else if (score >= quizData.length * 0.4) {
+                resultText.textContent = "Неплохо, но есть куда стремиться!";
+            } else {
+                resultText.textContent = "Попробуйте еще раз, чтобы улучшить результат!";
+            }
+        }
+
+        // Начать заново
+        function restartQuiz() {
+            quizContainer.style.display = 'block';
+            resultContainer.style.display = 'none';
+            startQuiz();
+        }
+
+        // Поделиться в VK
+        function shareVK() {
+            const url = `https://vk.com/share.php?url=${encodeURIComponent(window.location.href)}&title=Я набрал ${score} из ${quizData.length} в этой викторине! Попробуй и ты!`;
+            window.open(url, '_blank');
+        }
+
+        // Поделиться в Telegram
+        function shareTelegram() {
+            const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=Я набрал ${score} из ${quizData.length} в этой викторине! Попробуй и ты!`;
+            window.open(url, '_blank');
+        }
+
+        // Запуск игры при загрузке
+        window.onload = startQuiz;
+    </script>
+</body>
+</html>
